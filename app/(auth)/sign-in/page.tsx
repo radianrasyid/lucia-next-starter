@@ -9,11 +9,13 @@ import { Argon2id } from "oslo/password";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import type { ActionResult } from "@/lib/form";
 import { prisma } from "@/lib/prisma";
 import { TimeSpan } from "lucia";
 import { HMAC } from "oslo/crypto";
 import { createJWT } from "oslo/jwt";
+import { FaGithub } from "react-icons/fa";
 import { formSchema } from "../_helpers/formValidations";
 
 export default async function Page() {
@@ -22,8 +24,10 @@ export default async function Page() {
     return redirect("/");
   }
   return (
-    <div className="text-center">
-      <h1>Sign in</h1>
+    <div className="">
+      <div className="text-center flex items-center justify-center gap-x-2 mb-3">
+        <h1 className="font-medium uppercase">Sign In</h1>
+      </div>
       <Form action={login}>
         <div className="mb-3">
           <Label htmlFor="username">Username</Label>
@@ -33,11 +37,24 @@ export default async function Page() {
           <Label htmlFor="password">Password</Label>
           <Input type="password" name="password" id="password" />
         </div>
-        <Button>Continue</Button>
+        <Button className="w-full">Continue</Button>
       </Form>
-      <Link href="/sign-up" className="text-xs">
-        Create an account
-      </Link>
+      <div className="text-center mt-4 flex items-center justify-center gap-x-2">
+        <Separator orientation="horizontal" />
+        <Link href="/sign-up" className="text-xs">
+          <Button variant={"secondary"} size={"sm"}>
+            Create an account
+          </Button>
+        </Link>
+        <Separator orientation="horizontal" />
+      </div>
+      <div className="flex flex-wrap gap-2 justify-center mt-4">
+        <a href="/api/github/login">
+          <Button size={"lg"} variant={"outline"}>
+            <FaGithub />
+          </Button>
+        </a>
+      </div>
     </div>
   );
 }

@@ -19,6 +19,7 @@
 # misc
 .DS_Store
 *.pem
+.env.example
 
 # debug
 npm-debug.log*

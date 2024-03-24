@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-    id       String    @id
-    username String    @unique
-    password String
-    token    String?
-    sessions Session[]
+    id        String    @id
+    username  String    @unique
+    password  String
+    token     String?
+    github_id Int?      @unique
+    sessions  Session[]
 }
 
 model Session {
