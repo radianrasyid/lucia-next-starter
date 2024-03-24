@@ -2,6 +2,9 @@
   "name": "next-lucia-starter",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Muhammad Radian Rasyid"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
