@@ -21,17 +21,20 @@ export default async function Page() {
   }
   return (
     <div>
-      <h1>Create an account</h1>
       <Form action={signup}>
         <Label htmlFor="username">Username</Label>
         <Input name="username" id="username" />
-        <br />
         <Label htmlFor="password">Password</Label>
         <Input type="password" name="password" id="password" />
-        <br />
-        <Button>Continue</Button>
+        <Button className="w-full mt-3">Continue</Button>
       </Form>
-      <Link href="/sign-in">Sign in</Link>
+      <div className="text-center mt-3">
+        <Link href="/sign-in">
+          <Button variant={"secondary"} size={"sm"}>
+            Sign in
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }
@@ -48,6 +51,18 @@ export async function signup(
 
   if (validate.success) {
     const { username, password } = validate.data;
+    const isAlreadyThere = await prisma.user.findUnique({
+      where: {
+        username: username,
+      },
+    });
+
+    if (!!isAlreadyThere?.username) {
+      return {
+        error: "This username is already taken",
+      };
+    }
+
     const hashedPassword = await new Argon2id().hash(password);
     const userId = generateId(15);
 

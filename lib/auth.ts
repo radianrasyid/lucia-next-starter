@@ -18,6 +18,7 @@ export const lucia = new Lucia(adapter, {
       username: attributes.username,
       token: attributes.token,
       github_id: attributes.github_id,
+      google_id: attributes.google_id,
     };
   },
 });
@@ -79,7 +80,6 @@ export const validateRequest = cache(
     const result = await lucia.validateSession(sessionId);
     // next.js throws when you attempt to set cookie when rendering page
     try {
-      console.log("ini token sekarang", result.user?.token);
       if (!Boolean(result.user?.token)) {
         await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/logout`);
         return {
@@ -242,5 +242,6 @@ declare module "lucia" {
     username: string;
     token: string;
     github_id: string;
+    google_id: string;
   }
 }

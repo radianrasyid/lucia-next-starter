@@ -15,7 +15,7 @@ import { prisma } from "@/lib/prisma";
 import { TimeSpan } from "lucia";
 import { HMAC } from "oslo/crypto";
 import { createJWT } from "oslo/jwt";
-import { FaGithub } from "react-icons/fa";
+import { FaGithub, FaGoogle } from "react-icons/fa";
 import { formSchema } from "../_helpers/formValidations";
 
 export default async function Page() {
@@ -25,9 +25,6 @@ export default async function Page() {
   }
   return (
     <div className="">
-      <div className="text-center flex items-center justify-center gap-x-2 mb-3">
-        <h1 className="font-medium uppercase">Sign In</h1>
-      </div>
       <Form action={login}>
         <div className="mb-3">
           <Label htmlFor="username">Username</Label>
@@ -50,8 +47,13 @@ export default async function Page() {
       </div>
       <div className="flex flex-wrap gap-2 justify-center mt-4">
         <a href="/api/github/login">
-          <Button size={"lg"} variant={"outline"}>
+          <Button size={"icon"} variant={"outline"}>
             <FaGithub />
+          </Button>
+        </a>
+        <a href="/api/google/login">
+          <Button size={"icon"} variant={"outline"}>
+            <FaGoogle />
           </Button>
         </a>
       </div>

@@ -13,7 +13,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
       token: undefined,
     },
   });
-  console.log("ini id", user);
   if (!session) {
     return {
       error: "Unauthorized",

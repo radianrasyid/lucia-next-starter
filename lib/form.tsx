@@ -15,7 +15,9 @@ export function Form({
   return (
     <form action={formAction}>
       {children}
-      <p>{state.error}</p>
+      <div>
+        <p className="text-xs text-red-500">{state.error}</p>
+      </div>
     </form>
   );
 }

@@ -1,6 +1,8 @@
 "use server";
 
+import { generateCodeVerifier, generateState } from "arctic";
 import { cookies } from "next/headers";
+import { googleAuth } from "./googleProvider";
 
 export const enableCredential = () => {
   cookies().set(
@@ -11,4 +13,31 @@ export const enableCredential = () => {
       secure: true,
     }
   );
+};
+
+export const createGoogleAuthorizationURL = async () => {
+  try {
+    const state = generateState();
+    const codeVerifier = generateCodeVerifier();
+
+    cookies().set("codeVerifier", codeVerifier, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    });
+
+    const authorizationURL = await googleAuth.createAuthorizationURL(
+      state,
+      codeVerifier
+    );
+
+    return {
+      success: true,
+      data: authorizationURL,
+    };
+  } catch (error: any) {
+    return {
+      error: error?.message,
+    };
+  }
 };

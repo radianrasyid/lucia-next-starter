@@ -1,5 +1,5 @@
 import { lucia } from "@/lib/auth";
-import { github } from "@/lib/githubProvider";
+import { googleAuth } from "@/lib/googleProvider";
 import { prisma } from "@/lib/prisma";
 import { OAuth2RequestError } from "arctic";
 import { TimeSpan, generateId } from "lucia";
@@ -13,7 +13,9 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.nextUrl);
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
-  const storedState = cookies().get("github_oauth_state")?.value ?? null;
+  const storedState = cookies().get("google_oauth_state")?.value ?? null;
+  const storedCodeVerifier =
+    cookies().get("google_code_verifier")?.value ?? null;
   if (!code || !state || !storedState || state !== storedState) {
     return new Response(null, {
       status: 400,
@@ -21,26 +23,23 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const token = await github.validateAuthorizationCode(code);
-    const githubUserResponse = await fetch("https://api.github.com/user", {
-      headers: {
-        Authorization: `Bearer ${token.accessToken}`,
-      },
-    });
-    const githubUserEmailResponse = await fetch(
-      "https://api.github.com/user/emails",
+    const token = await googleAuth.validateAuthorizationCode(
+      code,
+      storedCodeVerifier as string
+    );
+    const googleUserResponse = await fetch(
+      "https://openidconnect.googleapis.com/v1/userinfo",
       {
         headers: {
           Authorization: `Bearer ${token.accessToken}`,
         },
       }
     );
-    const githubUser: GitHubUser = await githubUserResponse.json();
-    const githubUserEmail = await githubUserEmailResponse.json();
+    const googleUser = await googleUserResponse.json();
     // Replace this with your own db client
     const existingUser = await prisma.user.findUnique({
       where: {
-        email: githubUserEmail[0].email,
+        email: googleUser.email,
       },
     });
 
@@ -66,7 +65,7 @@ export async function GET(req: NextRequest) {
         },
         data: {
           token: jwt,
-          github_id: githubUser.id as any,
+          google_id: googleUser.sub,
         },
       });
       const origin = req.nextUrl.origin;
@@ -80,10 +79,10 @@ export async function GET(req: NextRequest) {
     const createUser = await prisma.user.create({
       data: {
         id: userId,
-        github_id: githubUser.id as any,
-        username: githubUser.login,
+        google_id: googleUser.sub,
+        username: googleUser.email,
         password: hashedPassword,
-        email: githubUserEmail[0].email,
+        email: googleUser.email,
       },
     });
     cookies().set("code", "911", {

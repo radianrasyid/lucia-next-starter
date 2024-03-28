@@ -21,12 +21,10 @@ const ProtectedPage = () => {
 
           toastPromise(fetching, {
             success: (data) => {
-              console.log("ini data", data);
               setCurrentData(data);
               return "Berhasil Hore!";
             },
             error: (data) => {
-              console.log("ini data error", data);
               return "Gagal";
             },
             loading: "Fetching...",
