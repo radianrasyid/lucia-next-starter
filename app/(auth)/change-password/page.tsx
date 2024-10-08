@@ -17,7 +17,7 @@ const ChangePasswordPage = async () => {
   });
   const isPasswordDefault = await new Argon2id().verify(
     userPassword?.password as string,
-    "12345678"
+    "12345678",
   );
   if (!!user?.username && isPasswordDefault) {
     return (
@@ -57,14 +57,14 @@ const ChangePasswordPage = async () => {
     );
   }
 
-  return redirect("/sign-in", RedirectType.replace);
+  return redirect("/lucia-starter/sign-in", RedirectType.replace);
 };
 
 export default ChangePasswordPage;
 
 export async function ChangeUserPassword(
   _: any,
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   "use server";
   const { user } = await validateRequest();
@@ -101,7 +101,7 @@ export async function ChangeUserPassword(
       },
     });
 
-    return redirect("/", RedirectType.replace);
+    return redirect("/lucia-starter", RedirectType.replace);
   } else if (!validate.success) {
     return {
       error: validate?.error?.message || "Password do not match",
