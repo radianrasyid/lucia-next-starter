@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { RedirectType, redirect } from "next/navigation";
 import { Argon2id } from "oslo/password";
 import { z } from "zod";
+import { ChangeUserPassword } from "../_helpers/functions";
 
 const ChangePasswordPage = async () => {
   const { user } = await validateRequest();
@@ -61,54 +62,3 @@ const ChangePasswordPage = async () => {
 };
 
 export default ChangePasswordPage;
-
-export async function ChangeUserPassword(
-  _: any,
-  formData: FormData,
-): Promise<ActionResult> {
-  "use server";
-  const { user } = await validateRequest();
-
-  const passwordSchema = z
-    .object({
-      newPassword: z.string().min(6),
-      newPasswordConfirm: z.string().min(6),
-    })
-    .refine((data) => data.newPasswordConfirm === data.newPassword, {
-      message: "Password do not match",
-      path: ["newPasswordConfirm"],
-    });
-  const newPassword = formData.get("newPassword");
-  const newPasswordConfirm = formData.get("newPasswordConfirm");
-  console.log("ini data masuk", {
-    newPassword,
-    newPasswordConfirm,
-  });
-
-  const validate = passwordSchema.safeParse({
-    newPassword,
-    newPasswordConfirm,
-  });
-  if (validate.success && !!user?.username) {
-    const { newPassword } = validate.data;
-    const hashedPassword = await new Argon2id().hash(newPassword);
-    await prisma.user.update({
-      where: {
-        username: user.username,
-      },
-      data: {
-        password: hashedPassword,
-      },
-    });
-
-    return redirect("/lucia-starter", RedirectType.replace);
-  } else if (!validate.success) {
-    return {
-      error: validate?.error?.message || "Password do not match",
-    };
-  }
-
-  return {
-    error: "Something went wrong",
-  };
-}
